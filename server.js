@@ -207,6 +207,38 @@ async function buatDestinasi(input) {
     return item;
 }
 
+//
+// versi
+async function bentukKeluar (versi, item) {
+  if (versi === 'v2') {
+    return item;
+  }
+  const regions = await bacaRegions();
+  const region = regions.find((r) => r.id === item.regionId);
+  return {
+    id: item.id,
+    name: item.name,
+    region: region? region.name: null,
+    category: item.category
+  };
+}
+
+async function bentukMasuk (versi, input) {
+  if (versi === 'v2' || input === null || typeof input !== 'object') {
+    return input;
+  }
+  const regions = await bacaRegions();
+  const region = regions.find((r) => r.name === input.region);
+  if (!region) {
+    throw buatError (400, 'region wajib diisi dengan nama region yang tersedia');
+  }
+  return {
+    name: input.name,
+    category: input.category,
+    regionId: region.id
+  };
+}
+
 // ---------- handler ----------
 async function daftarDestinasi(req, res, url) {
   let data = await bacaData();

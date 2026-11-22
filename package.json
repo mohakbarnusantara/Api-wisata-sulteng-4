@@ -11,6 +11,6 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "graphql": "^16.14.2"
+    "graphql": "^16.15.0"
   }
 }

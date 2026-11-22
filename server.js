@@ -412,12 +412,12 @@ const schema = buildSchema (`
     destinations: [Destination]
   }
 
-  type Weather {
-    temperature: Float
-    windSpeed: Float
-    time: String
-    humidity: Float
-  }
+type Weather {
+  temperature: Float
+  windSpeed: Float @deprecated(reason: "Gunakan windSpeedKmh sebagai pengganti")
+  windSpeedKmh: Float
+  weatherCode: Int
+}
 
   type Query {
     destinations(category: String): [Destination]
@@ -459,6 +459,7 @@ async function ambilCuaca(region) {
   return {
     temperature: hasil.current.temperature_2m,
     windSpeed: hasil.current.wind_speed_10m,
+    windSpeedKmh: hasil.current.wind_speed_10m,
     time: hasil.current.time,
     humidity: hasil.current.relative_humidity_2m
   };

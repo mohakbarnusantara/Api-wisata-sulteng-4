@@ -604,15 +604,22 @@ async function router (req, res) {
     return tanganiGraphQL (req, res);
   }
   
-  // Alamat REST wajib diawali versi: /v1/... atau /v2/...
-  const versi = segmen[0];
-  if (versi !== 'v1' && versi !== 'v2') {
-    return kirimError (res, 404, 'Alamat harus diawali /v1 atau /v2');
+// Versi API dapat ditentukan melalui awalan URI (/v1 atau /v2) atau header x-api-version
+  let versi;
+  let alamat;
+
+  if (segmen[0] === 'v1' || segmen[0] === 'v2') {
+    versi = segmen[0];
+    alamat = segmen.slice(1);
+  } else if (req.headers['x-api-version'] === '1' || req.headers['x-api-version'] === '2') {
+    versi = `v${req.headers['x-api-version']}`;
+    alamat = segmen;
+  } else {
+    return kirimError(res, 404, 'Alamat harus diawali /v1 atau /v2');
   }
-  
-  const alamat = segmen.slice(1);
+
   if (versi === 'v1') {
-  res.setHeader('Sunset', new Date(V1_BERAKHIR).toUTCString());
+    res.setHeader('Sunset', new Date(V1_BERAKHIR).toUTCString());
   }
   if (versi === 'v2' && alamat[0] === 'regions' && alamat.length <= 2) {
     return tanganiRegions (req, res, alamat);

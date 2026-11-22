@@ -611,11 +611,24 @@ async function router (req, res) {
   if (segmen[0] === 'v1' || segmen[0] === 'v2') {
     versi = segmen[0];
     alamat = segmen.slice(1);
-  } else if (req.headers['x-api-version'] === '1' || req.headers['x-api-version'] === '2') {
-    versi = `v${req.headers['x-api-version']}`;
-    alamat = segmen;
   } else {
-    return kirimError(res, 404, 'Alamat harus diawali /v1 atau /v2');
+    const headerVersi = req.headers['x-api-version'];
+    if (!headerVersi) {
+      return kirimError(
+        res,
+        400,
+        'Versi API wajib disebutkan melalui awalan URI (/v1 atau /v2) atau header x-api-version bernilai 1 atau 2'
+      );
+    }
+    if (headerVersi !== '1' && headerVersi !== '2') {
+      return kirimError(
+        res,
+        400,
+        'Nilai header x-api-version harus 1 atau 2, atau gunakan awalan URI /v1 atau /v2'
+      );
+    }
+    versi = `v${headerVersi}`;
+    alamat = segmen;
   }
 
   if (versi === 'v1') {

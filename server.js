@@ -247,6 +247,12 @@ async function daftarDestinasi (req, res, url, versi) {
   if (kategori) {
     data = data.filter((item) => item.category === kategori);
   }
+  if (versi === 'v2') {
+    const regionIdParam = url.searchParams.get('regionId');
+    if (regionIdParam !== null) {
+        data = data.filter((item) => item.regionId === Number(regionIdParam));
+    }
+}   
   const hasil = [];
   for (const item of data) {
     hasil.push(await bentukKeluar (versi, item));

@@ -5,14 +5,13 @@ info:
   description: >-
     API destinasi wisata Sulawesi Tengah. Seluruh request wajib menyertakan
     API key. Menambah dan menghapus data memerlukan token dari endpoint /login.
-    Disusun oleh Bagus Aldy Putra (F5512510009).
+    Disusun oleh Moh Akbar Nusantara (F5512520037).
 servers:
   - url: http://localhost:3000
     description: Server praktikum
 tags:
   - name: Login
   - name: Destinations
-  - name: Regions
 security:
   - ApiKeyAuth: []
 
@@ -127,70 +126,6 @@ paths:
           $ref: '#/components/responses/TidakBerhak'
         '404':
           $ref: '#/components/responses/TidakDitemukan'
-    put:
-      tags: [Destinations]
-      summary: Memperbarui data destinasi
-      security:
-        - ApiKeyAuth: []
-          BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DestinationInput'
-      responses:
-        '200':
-          description: Destinasi berhasil diperbarui
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Destination'
-        '400':
-          $ref: '#/components/responses/TidakValid'
-        '401':
-          $ref: '#/components/responses/TidakDikenali'
-        '404':
-          $ref: '#/components/responses/TidakDitemukan'
-  /v2/regions:
-    get:
-      tags: [Regions]
-      summary: Membaca daftar wilayah (region)
-      responses:
-        '200':
-          description: Daftar wilayah
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Region'
-        '401':
-          $ref: '#/components/responses/TidakDikenali'
-
-  /v2/regions/{id}:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        description: Nomor id wilayah
-        schema:
-          type: integer
-          example: 1
-    get:
-      tags: [Regions]
-      summary: Membaca satu wilayah
-      responses:
-        '200':
-          description: Data wilayah
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Region'
-        '401':
-          $ref: '#/components/responses/TidakDikenali'
-        '404':
-          $ref: '#/components/responses/TidakDitemukan'
 
   /v1/destinations:
     get:
@@ -201,8 +136,114 @@ paths:
       responses:
         '200':
           description: Daftar destinasi dengan field region berisi nama daerah
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DestinationV1'
         '401':
           $ref: '#/components/responses/TidakDikenali'
+    post:
+      tags: [Destinations]
+      summary: Menambah destinasi baru (versi lama)
+      description: Dilayani sampai 30 Juni 2027. Gunakan /v2/destinations.
+      deprecated: true
+      security:
+        - ApiKeyAuth: []
+          BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DestinationV1Input'
+      responses:
+        '201':
+          description: Destinasi berhasil ditambahkan
+          headers:
+            Location:
+              description: Alamat destinasi yang baru dibuat
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DestinationV1'
+        '400':
+          $ref: '#/components/responses/TidakValid'
+        '401':
+          $ref: '#/components/responses/TidakDikenali'
+
+  /v1/destinations/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Nomor id destinasi
+        schema:
+          type: integer
+          example: 1
+    get:
+      tags: [Destinations]
+      summary: Membaca satu destinasi (versi lama)
+      description: Dilayani sampai 30 Juni 2027. Gunakan /v2/destinations/{id}.
+      deprecated: true
+      responses:
+        '200':
+          description: Data destinasi versi lama
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DestinationV1'
+        '401':
+          $ref: '#/components/responses/TidakDikenali'
+        '404':
+          $ref: '#/components/responses/TidakDitemukan'
+    put:
+      tags: [Destinations]
+      summary: Memperbarui destinasi (versi lama)
+      description: Dilayani sampai 30 Juni 2027. Gunakan /v2/destinations/{id}.
+      deprecated: true
+      security:
+        - ApiKeyAuth: []
+          BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DestinationV1Input'
+      responses:
+        '200':
+          description: Destinasi berhasil diperbarui
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DestinationV1'
+        '400':
+          $ref: '#/components/responses/TidakValid'
+        '401':
+          $ref: '#/components/responses/TidakDikenali'
+        '404':
+          $ref: '#/components/responses/TidakDitemukan'
+    delete:
+      tags: [Destinations]
+      summary: Menghapus destinasi (versi lama)
+      description: Dilayani sampai 30 Juni 2027. Gunakan /v2/destinations/{id}.
+      deprecated: true
+      security:
+        - ApiKeyAuth: []
+          BearerAuth: []
+      responses:
+        '204':
+          description: Destinasi berhasil dihapus, tanpa body
+        '401':
+          $ref: '#/components/responses/TidakDikenali'
+        '403':
+          $ref: '#/components/responses/TidakBerhak'
+        '404':
+          $ref: '#/components/responses/TidakDitemukan'
 
 components:
   securitySchemes:
@@ -215,6 +256,34 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
+    DestinationV1:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Danau Poso
+        region:
+          type: string
+          example: Poso
+        category:
+          type: string
+          example: danau
+    DestinationV1Input:
+      type: object
+      required: [name, category, region]
+      properties:
+        name:
+          type: string
+          example: Air Terjun Wera
+        category:
+          type: string
+          example: alam
+        region:
+          type: string
+          example: Sigi
     Destination:
       type: object
       properties:
@@ -270,21 +339,6 @@ components:
         error:
           type: string
           example: Destinasi dengan id 99 tidak ditemukan
-    Region:
-      type: object
-      properties:
-        id:
-          type: integer
-          example: 1
-        name:
-          type: string
-          example: Kota Palu
-        latitude:
-          type: number
-          example: -0.8917
-        longitude:
-          type: number
-          example: 119.8707
   responses:
     TidakValid:
       description: Data yang dikirim tidak lengkap atau tidak valid
